@@ -24,6 +24,9 @@ module.exports = {
       isFinished: {
         type: Sequelize.BOOLEAN
       },
+      imageURL: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
