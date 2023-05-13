@@ -53,13 +53,18 @@ module.exports = (sequelize, DataTypes) => {
             },
             // FK from Relays
             RelayId: {
-                allowNull: false,
+                allowNull: true,
                 type: DataTypes.INTEGER,
                 references: {
                     model: 'Relays',
                     key: 'relayId',
                 },
                 onDelete: 'CASCADE',
+            },
+            isLike: {
+                allowNull: true,
+                type: DataTypes.BOOLEAN,
+                defaultValue: true
             },
             createdAt: {
                 allowNull: false,
