@@ -14,6 +14,11 @@ module.exports = (sequelize, DataTypes) => {
                 sourceKey: 'storyId',
                 foreignKey: 'StoryId',
             });
+            // storyId @ Stories -||--|<- StoryId @ Likes
+            this.hasMany(models.Likes, {
+                sourceKey: 'storyId',
+                foreignKey: 'StoryId',
+            });
         }
     }
     Stories.init(

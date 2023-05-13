@@ -1,31 +1,31 @@
 'use strict';
 const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-    class Relays extends Model {
+    class Likes extends Model {
         static associate(models) {
-            // relayId @ Relays -||--|<- RelayId @ Likes
-            this.hasMany(models.Likes, {
-                sourceKey: 'relayId',
-                foreignKey: 'RelayId',
-            });
-            // storyId @ Stories -||--|<- StoryId @ Relays
-            this.belongsTo(models.Stories, {
-                targetKey: 'storyId',
-                foreignKey: 'StoryId',
-                onDelete: 'CASCADE',
-            });
-            // uersId @ Users -||--|<- UserId @ Relays
+            // userId @ Users -||--|<- UserId @ Likes
             this.belongsTo(models.Users, {
                 targetKey: 'userId',
                 foreignKey: 'UserId',
-                onDelete: 'CASCADE',
+                onDelete: 'CASECADE',
+            });
+            // sotryId @ Stories -||--|<- StoryId @ Likes
+            this.belongsTo(models.Stories, {
+                targetKey: 'storyId',
+                foreignKey: 'StoryId',
+                onDelete: 'CASECADE',
+            });
+            // relayId @ Relays -||--|<- RelayId @ Likes
+            this.belongsTo(models.Relays, {
+                targetKey: 'relayId',
+                foreignKey: 'RelayId',
+                onDelete: 'CASECADE',
             });
         }
     }
-    Relays.init(
+    Likes.init(
         {
-            // PK
-            relayId: {
+            likeId: {
                 allowNull: false,
                 autoIncrement: true,
                 primaryKey: true,
@@ -51,13 +51,15 @@ module.exports = (sequelize, DataTypes) => {
                 },
                 onDelete: 'CASCADE',
             },
-            content: {
-                allowNull: false,
-                type: DataTypes.STRING,
-            },
-            likeCount: {
+            // FK from Relays
+            RelayId: {
                 allowNull: false,
                 type: DataTypes.INTEGER,
+                references: {
+                    model: 'Relays',
+                    key: 'relayId',
+                },
+                onDelete: 'CASCADE',
             },
             createdAt: {
                 allowNull: false,
@@ -72,8 +74,8 @@ module.exports = (sequelize, DataTypes) => {
         },
         {
             sequelize,
-            modelName: 'Relays',
+            modelName: 'Likes',
         }
     );
-    return Relays;
+    return Likes;
 };
