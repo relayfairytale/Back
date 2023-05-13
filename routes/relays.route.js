@@ -46,6 +46,48 @@ router.post('/:storyId/relay', auth, async (req, res) => {
     }
 });
 
+// 문장 내용 보기 API
+router.get('/:storyId/relay/:relayId', auth, async (req, res) => {
+    try {
+        // 동화 존재 여부 확인
+        const { storyId } = req.params;
+        const story = await Stories.findOne({ where: { storyId } });
+        if (!story) {
+            return res
+                .status(404)
+                .json({ errorMessage: '동화를 찾을 수 없습니다' });
+        }
+
+        // 이어쓴 문장 존재 여부 확인
+        const { relayId } = req.params;
+        const relay = await Relays.findOne({ where: { relayId } });
+        if (!relay) {
+            return res
+                .status(404)
+                .json({ errorMessage: '이어쓴 문장을 찾을 수 없습니다' });
+        }
+
+        // like 여부 확인 후 회신
+        const { userId } = res.locals.user;
+        const user = await Users.findOne({ where: { userId } });
+        const like = await Likes.findOne({
+            where: { RelayId: relayId, UserId: userId },
+        });
+        return res
+            .status(200)
+            .json({
+                relay: { user: user.nickname, like: like ? true : false },
+            });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            errorMessage: '알 수 없는 오류가 발생하여 조회를 실패했습니다.',
+        });
+    }
+});
+
+// 문장 수정 API
+// 마지막 문장만 수정 가능
 router.put('/:storyId/relay/:relayId', auth, async (req, res) => {
     // 수정 데이터 존재 여부 확인
     const { content } = req.body;
@@ -104,6 +146,8 @@ router.put('/:storyId/relay/:relayId', auth, async (req, res) => {
     }
 });
 
+// 문장 삭제 API
+// 마지막 문장만 삭제 가능
 router.delete('/:storyId/relay/:relayId', auth, async (req, res) => {
     // 동화 존재 여부 확인
     const { storyId } = req.params;
