@@ -1,0 +1,24 @@
+# Node.js dependencies
+node_modules/
+
+# Sequelize configuration
+config/
+config/config.json
+seeders/
+
+# draw.io backup files
+*.bkp
+
+# Excel files
+*.xlsx
+
+# Environment variables (change this to your actual environment variable file path)
+.env
+
+# Log files
+*.log
+logs/
+
+# Operating system files
+.DS_Store
+Thumbs.db
