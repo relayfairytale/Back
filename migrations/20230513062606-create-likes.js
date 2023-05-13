@@ -18,9 +18,6 @@ module.exports = {
       RelayId: {
         type: Sequelize.INTEGER
       },
-      isLike: {
-        type: Sequelize.BOOLEAN
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

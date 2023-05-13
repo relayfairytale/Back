@@ -61,11 +61,6 @@ module.exports = (sequelize, DataTypes) => {
                 },
                 onDelete: 'CASCADE',
             },
-            isLike: {
-                allowNull: true,
-                type: DataTypes.BOOLEAN,
-                defaultValue: true
-            },
             createdAt: {
                 allowNull: false,
                 type: DataTypes.DATE,
