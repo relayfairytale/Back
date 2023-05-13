@@ -52,7 +52,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
                 type: DataTypes.INTEGER,
             },
-            isFinish: {
+            isFinished: {
                 allowNull: false,
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,
