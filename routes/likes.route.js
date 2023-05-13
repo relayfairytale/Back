@@ -25,8 +25,9 @@ router.put('/:storyId/like', auth, async (req, res) => {
             await Likes.create({ StoryId: storyId, UserId: userId });
             // 좋아요 카운트 +1
             const likeCount = Number(story.likeCount) + 1;
+            console.log("not exist like data", likeCount);
             // Stories 수정
-            await Stories.Update({ likeCount }, { where: { storyId } });
+            await Stories.update({ likeCount }, { where: { storyId } });
             return res.status(200).json({ message: 'Liked' });
         } else {
             // 좋아요 있다면, 제거
@@ -35,8 +36,9 @@ router.put('/:storyId/like', auth, async (req, res) => {
             });
             // 좋아요 카운트 -1
             const likeCount = Number(story.likeCount) - 1;
+            console.log("exist like data",likeCount);
             // Stories 수정
-            await Stories.Update({ likeCount }, { where: { storyId } });
+            await Stories.update({ likeCount }, { where: { storyId } });
             return res.status(200).json({ message: 'Like canceled' });
         }
     } catch (err) {
@@ -83,8 +85,9 @@ router.put('/:storyId/relay/:relayId/like', auth, async (req, res) => {
             });
             // 좋아요 카운트 +1
             const likeCount = Number(relay.likeCount) + 1;
+            console.log(likeCount);
             // Relays 수정
-            await Relays.Update({ likeCount }, { where: { relayId } });
+            await Relays.update({ likeCount }, { where: { relayId } });
             return res.status(200).json({ message: 'Liked' });
         } else {
             // 자료가 있다면,
@@ -99,8 +102,9 @@ router.put('/:storyId/relay/:relayId/like', auth, async (req, res) => {
                 });
                 // 좋아요 카운트 -1
                 const likeCount = Number(story.likeCount) - 1;
+                console.log(likeCount);
                 // Relays 수정
-                await Relays.Update({ likeCount }, { where: { relayId } });
+                await Relays.update({ likeCount }, { where: { relayId } });
                 return res.status(200).json({ message: 'Like canceled' });
             } else {
                 // 자료가 싫어요라면, 기록 변경
@@ -110,8 +114,9 @@ router.put('/:storyId/relay/:relayId/like', auth, async (req, res) => {
                 );
                 // 좋아요 카운트 + 2 (싫어요 -1 → 좋아요 +1 => +2)
                 const likeCount = Number(story.likeCount) + 2;
+                console.log(likeCount);
                 // Relays 수정
-                await Relays.Update({ likeCount }, { where: { relayId } });
+                await Relays.update({ likeCount }, { where: { relayId } });
                 return res.status(200).json({ message: 'Like canceled' });
             }
         }
@@ -160,9 +165,10 @@ router.put('/:storyId/relay/:relayId/dislike', auth, async (req, res) => {
             });
             // 좋아요 카운트 -1
             const likeCount = Number(relay.likeCount) - 1;
+            console.log(likeCount);
             // Relays 수정
-            await Relays.Update({ likeCount }, { where: { relayId } });
-            return res.status(200).json({ message: 'Liked' });
+            await Relays.update({ likeCount }, { where: { relayId } });
+            return res.status(200).json({ message: 'Disliked' });
         } else {
             // 자료가 있다면,
             if (like.isLike) {
@@ -173,6 +179,7 @@ router.put('/:storyId/relay/:relayId/dislike', auth, async (req, res) => {
                 );
                 // 좋아요 카운트 - 2 (좋아요 +1 → 싫어요 -1 => -2)
                 const likeCount = Number(story.likeCount) - 2;
+                console.log(likeCount);
                 // Relays 수정
                 await Relays.Update({ likeCount }, { where: { relayId } });
                 return res.status(200).json({ message: 'Like canceled' });
@@ -187,8 +194,9 @@ router.put('/:storyId/relay/:relayId/dislike', auth, async (req, res) => {
                 });
                 // 좋아요 카운트 +1
                 const likeCount = Number(story.likeCount) + 1;
+                console.log(likeCount);
                 // Relays 수정
-                await Relays.Update({ likeCount }, { where: { relayId } });
+                await Relays.update({ likeCount }, { where: { relayId } });
                 return res.status(200).json({ message: 'Like canceled' });
             }
         }

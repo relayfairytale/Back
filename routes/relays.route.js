@@ -37,6 +37,7 @@ router.post('/:storyId/relay', auth, async (req, res) => {
             UserId: userId,
             likeCount: 0,
         });
+        return res.status(201).json({ message: 'created' });
     } catch (err) {
         console.error(err);
         res.status(500).json({
@@ -78,13 +79,14 @@ router.put('/:storyId/relay/:relayId', auth, async (req, res) => {
             .json({ errorMessage: '이어쓴 문장을 찾을 수 없습니다' });
     }
     // 이어쓴 문장 권한 확인
+    const { userId } = res.locals.user;
     if (relay.UserId !== userId) {
         return res.status(403).json({ errorMessage: '수정 권한이 없습니다.' });
     }
 
     // 이어쓴 문장이 가장 마지막 문장인지 확인
     const lastRelay = await Relays.findOne({ order: [['relayId', 'DESC']] });
-    if (lastRelay.realyId !== relay.relayId) {
+    if (lastRelay.relayId !== relay.relayId) {
         return res
             .status(403)
             .json({ errorMessage: '마지막 문장 외에는 수정할 수 없습니다.' });
@@ -93,6 +95,7 @@ router.put('/:storyId/relay/:relayId', auth, async (req, res) => {
     // 이어쓴 문장 수정
     try {
         await Relays.update({ content }, { where: { relayId } });
+        return res.status(200).json({ message: 'updated' });
     } catch (err) {
         console.error(err);
         res.status(500).json({
@@ -126,12 +129,13 @@ router.delete('/:storyId/relay/:relayId', auth, async (req, res) => {
             .json({ errorMessage: '이어쓴 문장을 찾을 수 없습니다' });
     }
     // 이어쓴 문장 권한 확인
+    const { userId } = res.locals.user;
     if (relay.UserId !== userId) {
         return res.status(403).json({ errorMessage: '삭제 권한이 없습니다.' });
     }
     // 이어쓴 문장이 가장 마지막 문장인지 확인
     const lastRelay = await Relays.findOne({ order: [['relayId', 'DESC']] });
-    if (lastRelay.realyId !== relay.relayId) {
+    if (lastRelay.relayId !== relay.relayId) {
         return res
             .status(403)
             .json({ errorMessage: '마지막 문장 외에는 삭제할 수 없습니다.' });
@@ -140,6 +144,7 @@ router.delete('/:storyId/relay/:relayId', auth, async (req, res) => {
     // 이어쓴 문장 삭제
     try {
         await Relays.destroy({ where: { relayId } });
+        return res.status(200).json({ message: 'deleted' });
     } catch (err) {
         console.error(err);
         res.status(500).json({
