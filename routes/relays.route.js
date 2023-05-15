@@ -4,7 +4,7 @@ const router = express.Router();
 const auth = require('../middlewares/auth-middleware');
 
 // 글 작성 시작
-router.post('/:storyId/isWriting', auth, async (req, res) => {
+router.post('/:storyId/relay/isWriting', auth, async (req, res) => {
     const { storyId } = req.params;
     const { userId } = res.locals.user;
     const story = await Stories.findOne({ where: { storyId } });
