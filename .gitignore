@@ -33,3 +33,6 @@ Thumbs.db
 # Dockerfile
 Dockerfile
 .dockerignore
+
+# AWS EB
+.elasticbeanstalk/
