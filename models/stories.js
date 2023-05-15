@@ -61,6 +61,12 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
                 type: DataTypes.STRING,
             },
+            newWriting: {
+                type: DataTypes.STRING
+              },
+              writingTime: {
+                type: DataTypes.DATE
+              },
             createdAt: {
                 allowNull: false,
                 type: DataTypes.DATE,

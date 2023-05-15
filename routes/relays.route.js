@@ -3,6 +3,20 @@ const { Users, Stories, Relays, Likes, Sequelize } = require('../models');
 const router = express.Router();
 const auth = require('../middlewares/auth-middleware');
 
+// 글 작성 시작
+router.post('/:storyId/isWriting', auth, async (req, res) => {
+    const { storyId } = req.params;
+    const { userId } = res.locals.user;
+    const story = await Stories.findOne({ where: { storyId } });
+    if (story.newWriting) {
+        return res.status(409).json({ errorMessage: '다른 사용자가 작성 중입니다.' });
+    }
+    story.newWriting = userId;
+    story.writingTime = new Date();
+    await story.save();
+    res.status(200).json({ message: '글 작성을 시작하였습니다.' });
+});
+
 // 문장 잇기 API
 router.post('/:storyId/relay', auth, async (req, res) => {
     // 작성 데이터 존재 여부 확인
@@ -37,6 +51,9 @@ router.post('/:storyId/relay', auth, async (req, res) => {
             UserId: userId,
             likeCount: 0,
         });
+        story.newWriting = null;
+        story.writingTime = null;
+        await story.save();
         return res.status(201).json({ message: 'created' });
     } catch (err) {
         console.error(err);
@@ -45,6 +62,21 @@ router.post('/:storyId/relay', auth, async (req, res) => {
         });
     }
 });
+
+// 주기적으로 글 작성 중인지 확인 1시간마다
+setInterval(async () => {
+    const stories = await Stories.findAll({
+        where: {
+            newWriting: { [Sequelize.Op.ne]: null },
+            writingTime: { [Sequelize.Op.lte]: new Date(Date.now() - 60 * 60 * 1000) },
+        },
+    });
+    stories.forEach(async (story) => {
+        story.newWriting = null;
+        story.writingTime = null;
+        await story.save();
+    });
+}, 60 * 60 * 1000);
 
 // 문장 내용 보기 API
 router.get('/:storyId/relay/:relayId', auth, async (req, res) => {
