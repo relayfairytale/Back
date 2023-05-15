@@ -6,7 +6,7 @@ const router = express.Router();
 // 전체 동화 조회 API
 router.get('/stories', async (req, res) => {
     const stories = await Stories.findAll({
-        attributes: ['storyId', 'title', 'content', 'isFinished', 'likeCount', 'createdAt', 'updatedAt'],
+        attributes: ['storyId', 'title', 'content', 'imageURL', 'isFinished', 'likeCount', 'createdAt', 'updatedAt'],
         include: [
             {
                 model: Users,
@@ -20,12 +20,12 @@ router.get('/stories', async (req, res) => {
 
 // 동화 작성 API
 router.post('/stories', authMiddleware, async (req, res) => {
-    const { title, content } = req.body;
+    const { title, content, imageURL } = req.body;
     const { userId } = res.locals.user;
 
     const likeCount = 0;
     try {
-        await Stories.create({ title, content, UserId: userId, likeCount });
+        await Stories.create({ title, content, imageURL, UserId: userId, likeCount });
 
         return res.status(201).json({ message: '새로운 동화를 작성하였습니다.' });
     } catch (err) {
@@ -37,7 +37,7 @@ router.post('/stories', authMiddleware, async (req, res) => {
 // 동화 수정 API
 router.put('/stories/:storyId', authMiddleware, async (req, res) => {
     const { storyId } = req.params;
-    const { title, content } = req.body;
+    const { title, content, imageURL } = req.body;
     const { userId } = res.locals.user;
 
     try {
@@ -52,7 +52,7 @@ router.put('/stories/:storyId', authMiddleware, async (req, res) => {
             return res.status(403).json({ errorMessage: '수정 권한이 없습니다.' });
         }
 
-        await Stories.update({ title, content }, { where: { storyId } });
+        await Stories.update({ title, content, imageURL }, { where: { storyId } });
 
         return res.status(200).json({ message: '동화를 수정하였습니다.' });
     } catch (err) {
@@ -94,7 +94,7 @@ router.get('/stories/:storyId', async (req, res) => {
     try {
         const story = await Stories.findOne({
             where: { storyId },
-            attributes: ['storyId', 'title', 'content', 'isFinished', 'likeCount', 'createdAt', 'updatedAt'],
+            attributes: ['storyId', 'title', 'content', 'imageURL', 'isFinished', 'likeCount', 'createdAt', 'updatedAt'],
             include: [
                 {
                     model: Users,
