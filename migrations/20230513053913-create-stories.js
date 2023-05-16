@@ -27,6 +27,12 @@ module.exports = {
       imageURL: {
         type: Sequelize.STRING
       },
+      newWriting: {
+        type: Sequelize.STRING
+      },
+      writingTime: {
+        type: Sequelize.DATE
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
