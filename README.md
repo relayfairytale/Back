@@ -6,7 +6,7 @@ Fairytale Relay은 사용자들이 협력적으로 이야기를 만들고 공유
 - [프로젝트 구조와 ERD](#프로젝트-구조와-erd)
 - [설치 및 실행](#설치-및-실행)
 - [Docker 이미지 빌드 및 실행](#docker-이미지-빌드-및-실행)
-- [API 문서 (Swagger)](#api-문서-swagger)
+- [API 문서(Swagger)](#api-문서(Swagger))
 
 ## 프로젝트 구조와 ERD
 
