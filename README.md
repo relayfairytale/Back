@@ -2,6 +2,12 @@
 
 Fairytale Relay은 사용자들이 협력적으로 이야기를 만들고 공유할 수 있는 프로젝트로 이 레포는 백엔드 API를 포함합니다.
 
+## 목차
+- [프로젝트 구조와 ERD](#프로젝트-구조와-erd)
+- [설치 및 실행](#설치-및-실행)
+- [Docker 이미지 빌드 및 실행](#docker-이미지-빌드-및-실행)
+- [API 문서 (Swagger)](#api-문서-swagger)
+
 ## 프로젝트 구조와 ERD
 
 ### 프로젝트의 디렉토리 구조는 다음과 같습니다:
@@ -67,6 +73,6 @@ docker run -p 3018:3018 -d fairytale-relay:latest
 ```
 4. 브라우저에서 http://localhost:3018 으로 접속하여 Fairytale Relay를 사용할 수 있습니다.
 
-## API 문서(Swagger))
+## API 문서(Swagger)
 
 API 문서는 스웨거를 통해 제공됩니다. 서버를 실행한 후, 브라우저에서 http://localhost:3018/api-docs/ 로 접속하면 API 문서를 확인할 수 있습니다. 스웨거를 통해 API 엔드포인트, 요청과 응답 형식, 인증 등의 정보를 자세히 확인할 수 있습니다.
