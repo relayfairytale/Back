@@ -2,11 +2,13 @@
 
 Fairytale Relay은 사용자들이 협력적으로 이야기를 만들고 공유할 수 있는 프로젝트로 이 레포는 백엔드 API를 포함합니다.
 
-## 목차
+### 목차
+
 - [프로젝트 구조와 ERD](#프로젝트-구조와-erd)
 - [설치 및 실행](#설치-및-실행)
 - [Docker 이미지 빌드 및 실행](#docker-이미지-빌드-및-실행)
-- [API 문서(Swagger)](#api-문서(Swagger))
+- [API 문서 (Swagger)](#api-문서swagger)
+
 
 ## 프로젝트 구조와 ERD
 
