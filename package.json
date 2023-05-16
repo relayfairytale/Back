@@ -4,7 +4,8 @@
   "description": "```\r Fairytale Relay\r Back\r ├─ .gitignore\r ├─ app.js\r ├─ middlewares\r │  └─ auth-middleware.js\r ├─ migrations\r ├─ models\r │  └─ index.js\r ├─ package-lock.json\r ├─ package.json\r ├─ README.md\r └─ routes\r    ├─ index.js\r    ├─ relays.route.js\r    ├─ stories.route.js\r    └─ users.route.js\r ```",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",

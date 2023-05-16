@@ -25,3 +25,14 @@ Thumbs.db
 
 # git
 .git
+
+# Docker 이미지 파일
+*.tar
+*.zip
+
+# Dockerfile
+Dockerfile
+.dockerignore
+
+# AWS EB
+.elasticbeanstalk/
