@@ -3,7 +3,52 @@ const { Users, Stories, Relays, Likes, Sequelize } = require('../models');
 const router = express.Router();
 const auth = require('../middlewares/auth-middleware');
 
-// 동화 좋아요 API
+/**
+ * @swagger
+ * /stories/{storyId}/like:
+ *   put:
+ *     summary: 동화 좋아요 API
+ *     description: 동화에 좋아요를 추가하거나 취소하는 API입니다.
+ *     parameters:
+ *       - in: path
+ *         name: storyId
+ *         description: 좋아요를 추가 또는 취소할 동화의 ID
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: 동화 좋아요 작업 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: 성공 메시지
+ *       404:
+ *         description: 동화 없음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errorMessage:
+ *                   type: string
+ *                   description: 오류 메시지
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errorMessage:
+ *                   type: string
+ *                   description: 오류 메시지
+ */
+
 router.put('/:storyId/like', auth, async (req, res) => {
     // 동화 존재 여부 확인
     const { storyId } = req.params;
@@ -49,7 +94,57 @@ router.put('/:storyId/like', auth, async (req, res) => {
     }
 });
 
-// 이어쓴 문장 좋아요 API
+/**
+ * @swagger
+ * /stories/{storyId}/relay/{relayId}/like:
+ *   put:
+ *     summary: 이어쓴 문장 좋아요 API
+ *     description: 이어쓴 문장에 좋아요를 추가하거나 취소하는 API입니다.
+ *     parameters:
+ *       - in: path
+ *         name: storyId
+ *         description: 좋아요를 추가 또는 취소할 동화의 ID
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: relayId
+ *         description: 좋아요를 추가 또는 취소할 이어쓴 문장의 ID
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: 이어쓴 문장 좋아요 작업 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: 성공 메시지
+ *       404:
+ *         description: 동화 또는 이어쓴 문장 없음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errorMessage:
+ *                   type: string
+ *                   description: 오류 메시지
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errorMessage:
+ *                   type: string
+ *                   description: 오류 메시지
+ */
 router.put('/:storyId/relay/:relayId/like', auth, async (req, res) => {
     // 동화 존재 여부 확인
     const { storyId } = req.params;
