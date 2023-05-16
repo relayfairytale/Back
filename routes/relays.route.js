@@ -3,21 +3,80 @@ const { Users, Stories, Relays, Likes, Sequelize } = require('../models');
 const router = express.Router();
 const auth = require('../middlewares/auth-middleware');
 
-// 글 작성 시작
-router.post('/:storyId/relay/isWriting', auth, async (req, res) => {
-    const { storyId } = req.params;
-    const { userId } = res.locals.user;
-    const story = await Stories.findOne({ where: { storyId } });
-    if (story.newWriting) {
-        return res.status(409).json({ errorMessage: '다른 사용자가 작성 중입니다.' });
-    }
-    story.newWriting = userId;
-    story.writingTime = new Date();
-    await story.save();
-    res.status(200).json({ message: '글 작성을 시작하였습니다.' });
-});
-
-// 문장 잇기 API
+/**
+ * @swagger
+ * /stories/{storyId}/relay:
+ *   post:
+ *     summary: 문장 작성 API
+ *     description: 동화에 새로운 문장을 작성하여 이어붙이는 API입니다.
+ *     parameters:
+ *       - in: path
+ *         name: storyId
+ *         description: 문장을 이어붙일 동화의 ID
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: body
+ *         name: content
+ *         description: 이어쓰는 문장 내용
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             content:
+ *               type: string
+ *     responses:
+ *       201:
+ *         description: 문장 작성 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: 성공 메시지
+ *       412:
+ *         description: 잘못된 데이터 형식
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errorMessage:
+ *                   type: string
+ *                   description: 오류 메시지
+ *       403:
+ *         description: 동화 완료로 인한 작성 제한
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errorMessage:
+ *                   type: string
+ *                   description: 오류 메시지
+ *       404:
+ *         description: 동화 없음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errorMessage:
+ *                   type: string
+ *                   description: 오류 메시지
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errorMessage:
+ *                   type: string
+ *                   description: 오류 메시지
+ */
 router.post('/:storyId/relay', auth, async (req, res) => {
     // 작성 데이터 존재 여부 확인
     const { content } = req.body;
@@ -63,6 +122,20 @@ router.post('/:storyId/relay', auth, async (req, res) => {
     }
 });
 
+// 글 작성 시작
+router.post('/:storyId/relay/isWriting', auth, async (req, res) => {
+    const { storyId } = req.params;
+    const { userId } = res.locals.user;
+    const story = await Stories.findOne({ where: { storyId } });
+    if (story.newWriting) {
+        return res.status(409).json({ errorMessage: '다른 사용자가 작성 중입니다.' });
+    }
+    story.newWriting = userId;
+    story.writingTime = new Date();
+    await story.save();
+    res.status(200).json({ message: '글 작성을 시작하였습니다.' });
+});
+
 // 주기적으로 글 작성 중인지 확인 1시간마다
 setInterval(async () => {
     const stories = await Stories.findAll({
@@ -78,7 +151,63 @@ setInterval(async () => {
     });
 }, 60 * 60 * 1000);
 
-// 문장 내용 보기 API
+/**
+ * @swagger
+ * /stories/{storyId}/relay/{relayId}:
+ *   get:
+ *     summary: 문장 내용 보기 API
+ *     description: 특정 이어쓴 문장의 내용을 조회하는 API입니다.
+ *     parameters:
+ *       - in: path
+ *         name: storyId
+ *         description: 문장이 이어진 동화의 ID
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: relayId
+ *         description: 조회할 이어쓴 문장의 ID
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: 문장 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 relay:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       type: string
+ *                       description: 이어쓴 사용자의 닉네임
+ *                     like:
+ *                       type: boolean
+ *                       description: 해당 이어쓴 문장에 좋아요를 누른 여부
+ *       404:
+ *         description: 동화 또는 이어쓴 문장 없음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errorMessage:
+ *                   type: string
+ *                   description: 오류 메시지
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errorMessage:
+ *                   type: string
+ *                   description: 오류 메시지
+ */
 router.get('/:storyId/relay/:relayId', auth, async (req, res) => {
     try {
         // 동화 존재 여부 확인
@@ -118,8 +247,86 @@ router.get('/:storyId/relay/:relayId', auth, async (req, res) => {
     }
 });
 
-// 문장 수정 API
-// 마지막 문장만 수정 가능
+/**
+ * @swagger
+ * /stories/{storyId}/relay/{relayId}:
+ *   put:
+ *     summary: 문장 수정 API
+ *     description: 특정 이어쓴 문장을 수정하는 API입니다.
+ *     parameters:
+ *       - in: path
+ *         name: storyId
+ *         description: 문장이 이어진 동화의 ID
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: relayId
+ *         description: 수정할 이어쓴 문장의 ID
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: body
+ *         name: content
+ *         description: 이어쓰는 문장 수정 내용
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             content:
+ *               type: string
+ *     responses:
+ *       200:
+ *         description: 문장 수정 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: 성공 메시지
+ *       412:
+ *         description: 잘못된 데이터 형식
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errorMessage:
+ *                   type: string
+ *                   description: 오류 메시지
+ *       403:
+ *         description: 수정 권한 없음 또는 마지막 문장 외의 수정 시도
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errorMessage:
+ *                   type: string
+ *                   description: 오류 메시지
+ *       404:
+ *         description: 동화 또는 이어쓴 문장 없음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errorMessage:
+ *                   type: string
+ *                   description: 오류 메시지
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errorMessage:
+ *                   type: string
+ *                   description: 오류 메시지
+ */
 router.put('/:storyId/relay/:relayId', auth, async (req, res) => {
     // 수정 데이터 존재 여부 확인
     const { content } = req.body;
@@ -178,8 +385,67 @@ router.put('/:storyId/relay/:relayId', auth, async (req, res) => {
     }
 });
 
-// 문장 삭제 API
-// 마지막 문장만 삭제 가능
+/**
+ * @swagger
+ * /stories/{storyId}/relay/{relayId}:
+ *   delete:
+ *     summary: 문장 삭제 API
+ *     description: 특정 이어쓴 문장을 삭제하는 API입니다.
+ *     parameters:
+ *       - in: path
+ *         name: storyId
+ *         description: 문장이 이어진 동화의 ID
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: relayId
+ *         description: 삭제할 이어쓴 문장의 ID
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: 문장 삭제 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: 성공 메시지
+ *       403:
+ *         description: 삭제 권한 없음 또는 마지막 문장 외의 삭제 시도
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errorMessage:
+ *                   type: string
+ *                   description: 오류 메시지
+ *       404:
+ *         description: 동화 또는 이어쓴 문장 없음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errorMessage:
+ *                   type: string
+ *                   description: 오류 메시지
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errorMessage:
+ *                   type: string
+ *                   description: 오류 메시지
+ */
 router.delete('/:storyId/relay/:relayId', auth, async (req, res) => {
     // 동화 존재 여부 확인
     const { storyId } = req.params;
