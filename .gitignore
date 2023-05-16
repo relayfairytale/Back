@@ -30,9 +30,5 @@ Thumbs.db
 *.tar
 *.zip
 
-# Dockerfile
-Dockerfile
-.dockerignore
-
 # AWS EB
 .elasticbeanstalk/
