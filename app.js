@@ -5,10 +5,12 @@ const storiesRouter = require('./routes/stories.route');
 const relaysRouter = require('./routes/relays.route');
 const likesRouter = require('./routes/likes.route')
 const { swaggerUi, swaggerSpec } = require('./swagger/swagger')
+const cors = require('cors')
 
 const app = express();
 const PORT = 3018;
 
+app.use(cors({ origin: 'http://localhost:3000' }));
 app.use(express.json());
 app.use(cookieParser());
 
