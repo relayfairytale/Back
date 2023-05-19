@@ -171,7 +171,7 @@ router.post('/signin', async (req, res) => {
             'customized-secret-key'
         );
         // 쿠키 생성
-        res.cookie('authorization', `Bearer ${token}`);
+        res.cookie('authorization', `Bearer ${token}`, {sameSite: 'none'});
         // 응답
         res.status(200).json({ token });
     } catch (err) {
