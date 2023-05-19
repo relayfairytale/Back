@@ -174,8 +174,7 @@ router.post('/signin', async (req, res) => {
         res.cookie(
             'authorization',
             `Bearer ${token}`,
-            { sameSite: 'none' },
-            { secure: false }
+            { sameSite: 'none', secure: false },
         );
         // 응답
         res.status(200).json({ token }); // message: '로그인에 성공했습니다.'
