@@ -52,7 +52,7 @@ const router = express.Router();
  *               properties:
  *                 errorMessage:
  *                   type: string
-*/
+ */
 router.post('/signup', async (req, res) => {
     const { nickname, password } = req.body;
     // 닉네임 정규식
@@ -171,9 +171,14 @@ router.post('/signin', async (req, res) => {
             'customized-secret-key'
         );
         // 쿠키 생성
-        res.cookie('authorization', `Bearer ${token}`, {sameSite: 'none'});
+        res.cookie(
+            'authorization',
+            `Bearer ${token}`,
+            { sameSite: 'none' },
+            { secure: false }
+        );
         // 응답
-        res.status(200).json({ token });
+        res.status(200).json({ token }); // message: '로그인에 성공했습니다.'
     } catch (err) {
         console.log(err);
         res.status(400).json({ errorMessage: '로그인에 실패하였습니다.' });
