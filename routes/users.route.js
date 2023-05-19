@@ -173,7 +173,7 @@ router.post('/signin', async (req, res) => {
         // 쿠키 생성
         res.cookie('authorization', `Bearer ${token}`);
         // 응답
-        res.status(200).json({ message: '로그인에 성공했습니다.' });
+        res.status(200).json({ token });
     } catch (err) {
         console.log(err);
         res.status(400).json({ errorMessage: '로그인에 실패하였습니다.' });
