@@ -167,15 +167,13 @@ router.post('/signin', async (req, res) => {
     try {
         // JWT 생성
         const token = jwt.sign(
-            { userId: user.userId },
+            { userId: user.userId, nickname: user.nickname },
             'customized-secret-key'
         );
         // 쿠키 생성
-        res.cookie(
-            'authorization',
-            `Bearer ${token}`,
-            { sameSite: 'none', secure: false },
-        );
+        res.cookie('authorization', `Bearer ${token}`);
+        // 헤더에 JWT 넣기
+        res.set({ authorization: `Bearer ${token}` });
         // 응답
         res.status(200).json({ token }); // message: '로그인에 성공했습니다.'
     } catch (err) {
