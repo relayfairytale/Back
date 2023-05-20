@@ -133,17 +133,15 @@ router.post('/:storyId/relay', auth, async (req, res) => {
  * @swagger
  * /stories/{storyId}/relay/isWriting:
  *   post:
- *     summary: Indicate that a user is currently writing a story.
- *     description: This endpoint is used to indicate that a user has started writing a story.
- *     tags:
- *       - Relay
+ *     summary: 누군가 문장 작성중인지 확인하는 API
+ *     description: 나도한번 써볼게요 버튼 누를 때 post로 누군가 작성중인지 확인
  *     parameters:
  *       - in: path
  *         name: storyId
  *         required: true
- *         description: The ID of the story.
+ *         description: 문장을 이어붙일 동화의 ID
  *         schema:
- *           type: string
+ *           type: integer
  *       - in: header
  *         name: Authorization
  *         required: true
