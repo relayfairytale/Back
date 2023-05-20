@@ -60,17 +60,20 @@ router.post('/:storyId/relay/isWriting', auth, async (req, res) => {
     const { userId } = res.locals.user;
     const story = await Stories.findOne({ where: { storyId } });
     if (story.newWriting === userId.toString()) {
-        res.status(200).json({ message: '글 작성을 시작하였습니다.' });
+        return res.status(200).json({ message: '글 작성을 시작하였습니다.' });
     }
     if (story.newWriting) {
-        return res
-            .status(409)
-            .json({ errorMessage: '다른 사용자가 작성 중입니다.' });
+        const user = await Users.findOne({
+            where: { userId: story.newWriting },
+        });
+        return res.status(409).json({
+            errorMessage: `다른 사용자 ${user.nickname}이(가) 작성 중입니다.`,
+        });
     } else {
         story.newWriting = userId;
         story.writingTime = new Date();
         await story.save();
-        res.status(200).json({ message: '글 작성을 시작하였습니다.' });
+        return res.status(200).json({ message: '글 작성을 시작하였습니다.' });
     }
 });
 
@@ -80,7 +83,7 @@ setInterval(async (check_interval) => {
         where: {
             newWriting: { [Sequelize.Op.ne]: null },
             writingTime: {
-                [Sequelize.Op.lte]: new Date(Date.now() - 60 * 10 * 1000),
+                [Sequelize.Op.lte]: new Date(Date.now() - 600 * 1000),
             },
         },
     });
@@ -91,7 +94,7 @@ setInterval(async (check_interval) => {
         await story.save();
         console.log(story.storyId, story.UserId, story.newWriting);
     });
-}, 60 * 10 * 1000);
+}, 600 * 1000);
 
 router.get('/:storyId/relay/:relayId', auth, async (req, res) => {
     try {
@@ -128,7 +131,10 @@ router.get('/:storyId/relay/:relayId', auth, async (req, res) => {
             where: { RelayId: relayId, UserId: userId },
         });
         return res.status(200).json({
-            relay: { user: relay.dataValues.nickname, like: like ? true : false },
+            relay: {
+                user: relay.dataValues.nickname,
+                like: like ? true : false,
+            },
         });
     } catch (err) {
         console.error(err);
@@ -172,6 +178,7 @@ router.put('/:storyId/relay/:relayId', auth, async (req, res) => {
     }
     // 이어쓴 문장 권한 확인
     const { userId } = res.locals.user;
+    console.log(userId, relay.UserId);
     if (relay.UserId !== userId) {
         return res.status(403).json({ errorMessage: '수정 권한이 없습니다.' });
     }
