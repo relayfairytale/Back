@@ -103,17 +103,24 @@ router.post('/:storyId/relay', auth, async (req, res) => {
 
     // 문장 잇기 기록
     const { userId } = res.locals.user;
+    console.log(userId, story.newWriting);
     try {
-        await Relays.create({
-            content,
-            StoryId: storyId,
-            UserId: userId,
-            likeCount: 0,
-        });
-        story.newWriting = null;
-        story.writingTime = null;
-        await story.save();
-        return res.status(201).json({ message: 'created' });
+        if (userId.toString() === story.newWriting) {
+            await Relays.create({
+                content,
+                StoryId: storyId,
+                UserId: userId,
+                likeCount: 0,
+            });
+            story.newWriting = null;
+            story.writingTime = null;
+            await story.save();
+            return res.status(201).json({ message: 'created' });
+        } else {
+            return res
+                .status(403)
+                .json({ errorMessage: '작성 권한이 없습니다.' });
+        }
     } catch (err) {
         console.error(err);
         res.status(500).json({
@@ -122,34 +129,88 @@ router.post('/:storyId/relay', auth, async (req, res) => {
     }
 });
 
-// 글 작성 시작
+/**
+ * @swagger
+ * /stories/{storyId}/relay/isWriting:
+ *   post:
+ *     summary: Indicate that a user is currently writing a story.
+ *     description: This endpoint is used to indicate that a user has started writing a story.
+ *     tags:
+ *       - Relay
+ *     parameters:
+ *       - in: path
+ *         name: storyId
+ *         required: true
+ *         description: The ID of the story.
+ *         schema:
+ *           type: string
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         description: Access token for authentication.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successful operation. The user has started writing the story.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: A success message indicating that the writing has started.
+ *                   example: '글 작성을 시작하였습니다.'
+ *       409:
+ *         description: Conflict. Another user is currently writing the story.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errorMessage:
+ *                   type: string
+ *                   description: An error message indicating that another user is currently writing the story.
+ *                   example: '다른 사용자가 작성 중입니다.'
+ */
 router.post('/:storyId/relay/isWriting', auth, async (req, res) => {
     const { storyId } = req.params;
     const { userId } = res.locals.user;
     const story = await Stories.findOne({ where: { storyId } });
-    if (story.newWriting) {
-        return res.status(409).json({ errorMessage: '다른 사용자가 작성 중입니다.' });
+    if (story.newWriting === userId.toString()) {
+        res.status(200).json({ message: '글 작성을 시작하였습니다.' });
     }
-    story.newWriting = userId;
-    story.writingTime = new Date();
-    await story.save();
-    res.status(200).json({ message: '글 작성을 시작하였습니다.' });
+    if (story.newWriting) {
+        return res
+            .status(409)
+            .json({ errorMessage: '다른 사용자가 작성 중입니다.' });
+    } else {
+        story.newWriting = userId;
+        story.writingTime = new Date();
+        await story.save();
+        res.status(200).json({ message: '글 작성을 시작하였습니다.' });
+    }
 });
 
-// 주기적으로 글 작성 중인지 확인 1시간마다
-setInterval(async () => {
+// 주기적으로 글 작성 중인지 확인 10분 마다
+setInterval(async (check_interval) => {
     const stories = await Stories.findAll({
         where: {
             newWriting: { [Sequelize.Op.ne]: null },
-            writingTime: { [Sequelize.Op.lte]: new Date(Date.now() - 60 * 60 * 1000) },
+            writingTime: {
+                [Sequelize.Op.lte]: new Date(Date.now() - 60 * 10 * 1000),
+            },
         },
     });
     stories.forEach(async (story) => {
+        console.log(story.storyId, story.UserId, story.newWriting);
         story.newWriting = null;
         story.writingTime = null;
         await story.save();
+        console.log(story.storyId, story.UserId, story.newWriting);
     });
-}, 60 * 60 * 1000);
+}, 60 * 10 * 1000);
 
 /**
  * @swagger
@@ -234,11 +295,9 @@ router.get('/:storyId/relay/:relayId', auth, async (req, res) => {
         const like = await Likes.findOne({
             where: { RelayId: relayId, UserId: userId },
         });
-        return res
-            .status(200)
-            .json({
-                relay: { user: user.nickname, like: like ? true : false },
-            });
+        return res.status(200).json({
+            relay: { user: user.nickname, like: like ? true : false },
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({
