@@ -1,0 +1,744 @@
+swagger: "2.0"
+info:
+  title: Relay FairyTale
+  description: '릴레이 동화 서비스를 위한 Node.js환경 Swagger-jsdoc 방식 HTTP API 클라이언트 UI'
+  version: 1.1.0
+tags:
+  - name: users
+    description: 유저 회원가입 및 로그인 API 엔드포인트
+  - name: stories
+    description: 동화 작성, 조회, 수정, 삭제 API 엔드포인트
+  - name: relays
+    description: 이어쓰기 작성, 조회, 수정, 삭제 API 엔드포인트
+  - name: likes
+    description: 동화와 이어쓰기 문장 좋아요 API 엔드포인트
+paths:
+  /signup:
+    post:
+      tags:
+        - users
+      summary: 회원가입 API
+      description: 새로운 사용자를 회원으로 등록하는 API입니다.
+      parameters:
+        - in: body
+          name: user
+          description: 회원가입할 사용자 정보
+          required: true
+          schema:
+            type: object
+            properties:
+              nickname:
+                type: string
+              password:
+                type: string
+      responses:
+        201:
+          description: 회원가입 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: 회원가입 성공 메시지
+        400:
+          description: 잘못된 요청 데이터 형식
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지
+        412:
+          description: 유효성 검사 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+  /signin:
+    post:
+      tags:
+        - users
+      summary: 로그인 API
+      description: 사용자를 인증하여 로그인하는 API입니다.
+      parameters:
+        - in: body
+          name: user
+          description: 로그인할 사용자 정보
+          required: true
+          schema:
+            type: object
+            properties:
+              nickname:
+                type: string
+              password:
+                type: string
+      responses:
+        200:
+          description: 로그인 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: 로그인 성공 메시지
+        400:
+          description: 로그인 실패
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지
+        401:
+          description: 인증 실패
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지
+  /stories:
+    get:
+      tags:
+        - stories
+      summary: 전체 동화 조회 API
+      description: 전체 동화를 조회하는 API입니다.
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              stories:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    storyId:
+                      type: integer
+                    title:
+                      type: string
+                    content:
+                      type: string
+                    imageURL:
+                      type: string
+                    isFinished:
+                      type: boolean
+                    likeCount:
+                      type: integer
+                    createdAt:
+                      type: string
+                      format: date-time
+                    updatedAt:
+                      type: string
+                      format: date-time
+                    User:
+                      type: object
+                      properties:
+                        nickname:
+                          type: string
+    post:
+      tags:
+        - stories
+      summary: 동화 작성 API
+      description: 새로운 동화를 작성하는 API입니다.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: body
+          name: story
+          description: 동화 작성 데이터
+          required: true
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              content:
+                type: string
+              imageURL:
+                type: string
+      responses:
+        201:
+          description: 동화 작성 성공
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        400:
+          description: 동화 작성 실패
+          schema:
+            type: object
+            properties:
+              errorMessage:
+                type: string
+  /stories/{storyId}:
+    get:
+      tags:
+        - stories
+      summary: 동화 상세 조회 API
+      description: 특정 동화의 상세 정보를 조회하는 API입니다.
+      parameters:
+        - in: path
+          name: storyId
+          description: 동화 ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 성공적으로 조회된 동화 데이터
+          schema:
+            type: object
+            properties:
+              story:
+                type: object
+                properties:
+                  storyId:
+                    type: integer
+                  title:
+                    type: string
+                  content:
+                    type: string
+                  imageURL:
+                    type: string
+                  isFinished:
+                    type: boolean
+                  like:
+                    type: integer
+                  relays:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        relayId:
+                          type: integer
+                        content:
+                          type: string
+                        likeCount:
+                          type: integer
+                        user:
+                          type: string
+        404:
+          description: 존재하지 않는 동화
+          schema:
+            type: object
+            properties:
+              errorMessage:
+                type: string
+        400:
+          description: 동화 상세 조회 실패
+          schema:
+            type: object
+            properties:
+              errorMessage:
+                type: string
+    put:
+      tags:
+        - stories
+      summary: 동화 수정 API
+      description: 동화를 수정하는 API입니다.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: storyId
+          description: 동화 ID
+          required: true
+          schema:
+            type: integer
+        - in: body
+          name: story
+          description: 동화 정보
+          required: true
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              content:
+                type: string
+              imageURL:
+                type: string
+      responses:
+        200:
+          description: 동화 수정 성공
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        400:
+          description: 동화 수정 실패
+          schema:
+            type: object
+            properties:
+              errorMessage:
+                type: string
+        403:
+          description: 수정 권한 없음
+          schema:
+            type: object
+            properties:
+              errorMessage:
+                type: string
+        404:
+          description: 존재하지 않는 동화
+          schema:
+            type: object
+            properties:
+              errorMessage:
+                type: string
+    delete:
+      tags:
+        - stories
+      summary: 동화 삭제 API
+      description: 동화를 삭제하는 API입니다.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: storyId
+          description: 동화 ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 동화 삭제 성공
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        400:
+          description: 동화 삭제 실패
+          schema:
+            type: object
+            properties:
+              errorMessage:
+                type: string
+        403:
+          description: 삭제 권한 없음
+          schema:
+            type: object
+            properties:
+              errorMessage:
+                type: string
+        404:
+          description: 존재하지 않는 동화
+          schema:
+            type: object
+            properties:
+              errorMessage:
+                type: string
+  /stories/{storyId}/relay:
+    post:
+      tags:
+        - relays
+      summary: 문장 작성 API
+      description: 동화에 새로운 문장을 작성하여 이어붙이는 API입니다.
+      parameters:
+        - in: path
+          name: storyId
+          description: 문장을 이어붙일 동화의 ID
+          required: true
+          schema:
+            type: integer
+        - in: body
+          name: content
+          description: 이어쓰는 문장 내용
+          required: true
+          schema:
+            type: object
+            properties:
+              content:
+                type: string
+      responses:
+        201:
+          description: 문장 작성 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: 성공 메시지
+        412:
+          description: 잘못된 데이터 형식
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지
+        403:
+          description: 동화 완료로 인한 작성 제한
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지
+        404:
+          description: 동화 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지
+        500:
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지
+  /stories/{storyId}/relay/isWriting:
+    post:
+      tags:
+        - relays
+      summary: 누군가 문장 작성중인지 확인하는 API
+      description: 나도한번 써볼게요 버튼 누를 때 post로 누군가 작성중인지 확인
+      parameters:
+        - in: path
+          name: storyId
+          required: true
+          description: 문장을 이어붙일 동화의 ID
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 글 작성 시작
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A success message indicating that the writing has started.
+                    example: '글 작성을 시작하였습니다.'
+        409:
+          description: 다른 사용자가 작성 중
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: An error message indicating that another user is currently writing the story.
+                    example: '다른 사용자가 작성 중입니다.'
+  /stories/{storyId}/relay/{relayId}:
+    get:
+      tags:
+        - relays
+      summary: 문장 내용 보기 API
+      description: 특정 이어쓴 문장의 내용을 조회하는 API입니다.
+      parameters:
+        - in: path
+          name: storyId
+          description: 문장이 이어진 동화의 ID
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: relayId
+          description: 조회할 이어쓴 문장의 ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 문장 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  relay:
+                    type: object
+                    properties:
+                      user:
+                        type: string
+                        description: 이어쓴 사용자의 닉네임
+                      like:
+                        type: boolean
+                        description: 해당 이어쓴 문장에 좋아요를 누른 여부
+        404:
+          description: 동화 또는 이어쓴 문장 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지
+        500:
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지
+    put:
+      tags:
+        - relays
+      summary: 문장 수정 API
+      description: 특정 이어쓴 문장을 수정하는 API입니다.
+      parameters:
+        - in: path
+          name: storyId
+          description: 문장이 이어진 동화의 ID
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: relayId
+          description: 수정할 이어쓴 문장의 ID
+          required: true
+          schema:
+            type: string
+        - in: body
+          name: content
+          description: 이어쓰는 문장 수정 내용
+          required: true
+          schema:
+            type: object
+            properties:
+              content:
+                type: string
+      responses:
+        200:
+          description: 문장 수정 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: 성공 메시지
+        412:
+          description: 잘못된 데이터 형식
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지
+        403:
+          description: 수정 권한 없음 또는 마지막 문장 외의 수정 시도
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지
+        404:
+          description: 동화 또는 이어쓴 문장 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지
+        500:
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지
+    delete:
+      tags:
+        - relays
+      summary: 문장 삭제 API
+      description: 특정 이어쓴 문장을 삭제하는 API입니다.
+      parameters:
+        - in: path
+          name: storyId
+          description: 문장이 이어진 동화의 ID
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: relayId
+          description: 삭제할 이어쓴 문장의 ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 문장 삭제 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: 성공 메시지
+        403:
+          description: 삭제 권한 없음 또는 마지막 문장 외의 삭제 시도
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지
+        404:
+          description: 동화 또는 이어쓴 문장 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지
+        500:
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지
+  /stories/{storyId}/like:
+    put:
+      tags:
+        - likes
+      summary: 동화 좋아요 API
+      description: 동화에 좋아요를 추가하거나 취소하는 API입니다.
+      parameters:
+        - in: path
+          name: storyId
+          description: 좋아요를 추가 또는 취소할 동화의 ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 동화 좋아요 작업 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: 성공 메시지
+        404:
+          description: 동화 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지
+        500:
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지
+  /stories/{storyId}/relay/{relayId}/like:
+    put:
+      tags:
+        - likes
+      summary: 이어쓴 문장 좋아요 API
+      description: 이어쓴 문장에 좋아요를 추가하거나 취소하는 API입니다.
+      parameters:
+        - in: path
+          name: storyId
+          description: 좋아요를 추가 또는 취소할 동화의 ID
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: relayId
+          description: 좋아요를 추가 또는 취소할 이어쓴 문장의 ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 이어쓴 문장 좋아요 작업 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: 성공 메시지
+        404:
+          description: 동화 또는 이어쓴 문장 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지
+        500:
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    description: 오류 메시지

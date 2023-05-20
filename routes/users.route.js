@@ -4,55 +4,6 @@ const { Users } = require('../models');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 
-/**
- * @swagger
- * /signup:
- *   post:
- *     summary: 회원가입 API
- *     description: 새로운 사용자를 회원으로 등록하는 API입니다.
- *     parameters:
- *       - in: body
- *         name: user
- *         description: 회원가입할 사용자 정보
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             nickname:
- *               type: string
- *             password:
- *               type: string
- *     responses:
- *       201:
- *         description: 회원가입 성공
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: 회원가입 성공 메시지
- *       400:
- *         description: 잘못된 요청 데이터 형식
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 errorMessage:
- *                   type: string
- *                   description: 오류 메시지
- *       412:
- *         description: 유효성 검사 오류
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 errorMessage:
- *                   type: string
- */
 router.post('/signup', async (req, res) => {
     const { nickname, password } = req.body;
     // 닉네임 정규식
@@ -101,56 +52,6 @@ router.post('/signup', async (req, res) => {
     res.status(201).json({ message: '회원가입에 성공했습니다.' });
 });
 
-/**
- * @swagger
- * /signin:
- *   post:
- *     summary: 로그인 API
- *     description: 사용자를 인증하여 로그인하는 API입니다.
- *     parameters:
- *       - in: body
- *         name: user
- *         description: 로그인할 사용자 정보
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             nickname:
- *               type: string
- *             password:
- *               type: string
- *     responses:
- *       200:
- *         description: 로그인 성공
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: 로그인 성공 메시지
- *       400:
- *         description: 로그인 실패
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 errorMessage:
- *                   type: string
- *                   description: 오류 메시지
- *       401:
- *         description: 인증 실패
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 errorMessage:
- *                   type: string
- *                   description: 오류 메시지
- */
 router.post('/signin', async (req, res) => {
     const { nickname, password } = req.body;
     const user = await Users.findOne({
