@@ -150,7 +150,7 @@ router.post('/:storyId/relay', auth, async (req, res) => {
  *           type: string
  *     responses:
  *       200:
- *         description: Successful operation. The user has started writing the story.
+ *         description: 글 작성 시작
  *         content:
  *           application/json:
  *             schema:
@@ -161,7 +161,7 @@ router.post('/:storyId/relay', auth, async (req, res) => {
  *                   description: A success message indicating that the writing has started.
  *                   example: '글 작성을 시작하였습니다.'
  *       409:
- *         description: Conflict. Another user is currently writing the story.
+ *         description: 다른 사용자가 작성 중
  *         content:
  *           application/json:
  *             schema:
