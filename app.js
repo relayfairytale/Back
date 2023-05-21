@@ -16,7 +16,6 @@ const cors = require('cors');
 app.use(
     cors({
         origin: ['http://localhost:3000', 'https://front-pi-smoky.vercel.app/', 'http://rft.ysizuku.com/'],
-        origin: ['http://localhost:3000', 'https://front-pi-smoky.vercel.app/'],
         credentials: true,
     })
 );
