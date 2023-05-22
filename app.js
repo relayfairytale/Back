@@ -15,7 +15,7 @@ const swaggerDocument = yaml.load(fs.readFileSync('./swagger.yaml', 'utf8'));
 const cors = require('cors');
 app.use(
     cors({
-        origin: ['http://localhost:3000', 'https://front-pi-smoky.vercel.app/', 'http://rft.ysizuku.com/'],
+        origin: ['http://localhost:3000', 'https://front-pi-smoky.vercel.app', 'http://rft.ysizuku.com'],
         credentials: true,
     })
 );
