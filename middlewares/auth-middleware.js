@@ -2,7 +2,10 @@ const jwt = require('jsonwebtoken');
 const { Users } = require('../models');
 
 module.exports = async (req, res, next) => {
-  const { authorization } = req.cookies;
+  const authorizationCookies = req.cookies.authorization;
+  const authorizationHeaders = req.headers.authorization;
+
+  const authorization = authorizationCookies? authorizationCookies : authorizationHeaders
 
   if (!authorization) {
     return res.status(401).json({ errorMessage: '로그인 후 사용하세요.' });
