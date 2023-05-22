@@ -58,9 +58,6 @@ router.put('/stories/:storyId', authMiddleware, async (req, res) => {
     }
 });
 
-/**
- * @swagger
- */  
 router.delete('/stories/:storyId', authMiddleware, async (req, res) => {
     const { storyId } = req.params;
     const { userId } = res.locals.user;

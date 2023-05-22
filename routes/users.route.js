@@ -72,7 +72,12 @@ router.post('/signin', async (req, res) => {
             'customized-secret-key'
         );
         // 쿠키 생성
-        res.cookie('authorization', `Bearer ${token}`);
+        res.cookie('authorization', `Bearer ${token}`, {
+            maxAge: 3600000,
+            httpOnly: true,
+            sameSite: 'strict',
+            domain: 'http://rft.ysizuku.com'
+        });
         // 헤더에 JWT 넣기
         res.set({ authorization: `Bearer ${token}` });
         // 응답
