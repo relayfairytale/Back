@@ -31,7 +31,7 @@ router.post('/:storyId/relay', auth, async (req, res) => {
     const { userId } = res.locals.user;
     console.log(userId, story.newWriting);
     try {
-        if (userId.toString() === story.newWriting) {
+        if (userId.toString() === story.newWriting || story.newWriting === null) {
             await Relays.create({
                 content,
                 StoryId: storyId,
